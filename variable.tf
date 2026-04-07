@@ -13,7 +13,7 @@ variable "security_group" {
 variable "instance_name" {
   description = "mention server name"
   type        = string
-  default     = "pipeline"
+  default     = "asha-nandankar"
 }
 
 variable "aws_access_key" {
