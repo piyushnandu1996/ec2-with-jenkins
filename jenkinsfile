@@ -1,0 +1,64 @@
+pipeline{
+  agent any
+    stages
+    parameters{
+        booleanParam(name: 'autoApprove', defaultValue: false, description: 'Automatically run apply after generating plan')
+        choice(name: 'action', choice["apply", "destroy"], description: 'select action to perform')
+
+    }
+
+    environment {
+        aws_access_key = aws_access_key
+        aws_secret_key = aws_secret_key
+        aws_region = aws_region
+    }
+        stage("git clone"){
+            steps{
+                git branch:"main", url:"https://github.com/piyushnandu1996/terraform-jenkins-pipeline.git"
+
+            }
+        }
+
+        stage('initialise terraform'){
+            steps{
+                sh 'terraform init'
+            }
+        }
+
+        stage('validatting'){
+            steps{
+                sh 'terraform validate'
+            }
+        }
+
+        stage('formatting'){
+            steps{
+                sh 'terraform fmt'
+            }
+        }
+
+        stage('planning before deploying'){
+            steps{
+                sh 'terraform plan -out=tfout'
+            }
+        }
+
+        stage('apply/destroy'){
+            steps{
+                if (param.action == "apply"){
+                    sh 'terraform apply tfout --auto-approve'
+                } else if (param.action == "destroy") {
+                    sh 'terraform destroy --auto-approve'
+                } else if (param.autoApprove == true){
+                    sh 'terraform apply tfout --auto-approve'
+                }
+
+            }
+        }
+
+
+
+
+    
+
+}
