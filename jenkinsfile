@@ -1,20 +1,20 @@
 pipeline{
   agent any
-    stages
+    
     parameters{
         booleanParam(name: 'autoApprove', defaultValue: false, description: 'Automatically run apply after generating plan')
-        choice(name: 'action', choice["apply", "destroy"], description: 'select action to perform')
+        choice(name: 'action', choices: ["apply", "destroy"], description: 'select action to perform')
 
     }
 
     environment {
-        aws_access_key = aws_access_key
-        aws_secret_key = aws_secret_key
-        aws_region = aws_region
+        AWS_ACCESS_KEY_ID = credentials('AWS_ACCESS_KEY_ID')
+        AWS_SECRET_ACCESS_KEY = credentials('AWS_SECRET_ACCESS_KEY')
     }
+    stages{
         stage("git clone"){
             steps{
-                git branch:"main", url:"https://github.com/piyushnandu1996/terraform-jenkins-pipeline.git"
+                git branch:"main", url:"https://github.com/piyushnandu1996/ec2-with-jenkins.git"
 
             }
         }
@@ -45,12 +45,19 @@ pipeline{
 
         stage('apply/destroy'){
             steps{
-                if (param.action == "apply"){
-                    sh 'terraform apply tfout --auto-approve'
-                } else if (param.action == "destroy") {
-                    sh 'terraform destroy --auto-approve'
-                } else if (param.autoApprove == true){
-                    sh 'terraform apply tfout --auto-approve'
+                script {
+                    if (params.action == "apply") {
+                        if (!params.autoApprove) {
+                            input message: "Do you want to apply the plan?"
+                            sh 'terraform apply tfout'
+                        } else {
+                            sh 'terraform apply tfout'
+                        }
+                    } else if (params.action == "destroy") {
+                        input message: "Do you want to destroy the plan?"
+                        sh 'terraform destroy'
+                    }
+
                 }
 
             }
@@ -59,6 +66,6 @@ pipeline{
 
 
 
-    
+    }    
 
 }
