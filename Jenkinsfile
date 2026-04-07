@@ -14,8 +14,7 @@ pipeline{
     stages{
         stage("git clone"){
             steps{
-                git branch:"main", url:"https://github.com/piyushnandu1996/terraform-jenkins-pipeline.git"
-
+                git branch:"main", url:"https://github.com/piyushnandu1996/ec2-with-jenkins"
             }
         }
 
