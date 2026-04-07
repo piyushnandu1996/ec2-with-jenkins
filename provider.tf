@@ -12,14 +12,6 @@ terraform {
     }
   }
 
-  backend "s3" {
-    bucket         = "my-terraform-state-bucket-1996"
-    dynamodb_table = "terraform-lock-table"
-    key            = "jenkins-pipeline/terraform.tfstat"
-    use_lockfile   = true
-    encrypt        = true
-    region         = "ap-south-1"
-  }
 
 }
 
